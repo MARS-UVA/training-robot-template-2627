@@ -1,0 +1,42 @@
+{
+    "name": "control-station \u2014 Linux",
+    "privileged": true,
+    "remoteUser": "diana",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "args": {
+            "USERNAME": "diana"
+        }
+    },
+    "workspaceFolder": "/home/ws/control-station",
+    "workspaceMount": "source=${localWorkspaceFolder}/..,target=/home/ws,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes",
+                "twxs.cmake",
+                "donjayamanne.python-extension-pack",
+                "eamodio.gitlens",
+                "ms-iot.vscode-ros"
+            ]
+        }
+    },
+    "containerEnv": {
+        "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
+        "ROS_DOMAIN_ID": "42"
+    },
+    "forwardPorts": [
+        5173,
+        9090
+    ],
+    "appPort": [
+        "5173:5173/tcp",
+        "9090:9090/tcp"
+    ],
+    "postCreateCommand": [
+        "bash",
+        "-c",
+        "set -eo pipefail; source /opt/ros/jazzy/setup.bash; sudo apt-get update; (rosdep update || sudo rosdep update); sudo rosdep install --from-paths /home/ws/control-station/src --ignore-src -y --rosdistro jazzy; cd /home/ws/control-station; npm ci; LINE='source /home/ws/control-station/setup-terminal.sh'; grep -qxF \"$LINE\" ~/.bashrc || echo \"$LINE\" >> ~/.bashrc"
+    ]
+}

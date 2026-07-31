@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:macro name="robot_ros2_control" params="robot_backend">
+
+<ros2_control name="TrainingBotSystem" type="system">
+
+<hardware>
+    <xacro:if value="${robot_backend == 'gazebo'}">
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </xacro:if>
+    <xacro:if value="${robot_backend == 'mujoco'}">
+      <plugin>mujoco_ros2_control/MujocoSystemInterface</plugin>
+      <param name="headless">false</param>
+      <!-- <param name="mujoco_model">${mujoco_model_path}</param> -->
+      <param name="sim_speed_factor">1.0</param>
+    </xacro:if>
+    <xacro:if value="${robot_backend == 'mock'}">
+      <plugin>mock_components/GenericSystem</plugin>
+    </xacro:if>
+    <xacro:if value="${robot_backend == 'serial'}">
+      <plugin>robot_serial_hardware/RobotSerialHardware</plugin>
+      <param name="port">/dev/ttyUSB0</param>
+      <param name="baudrate">115200</param>
+    </xacro:if>
+</hardware>
+
+
+<joint name="front_left_wheel_joint">
+    <command_interface name="velocity"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+</joint>
+
+<joint name="front_right_wheel_joint">
+    <command_interface name="velocity"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+</joint>
+
+<joint name="rear_left_wheel_joint">
+    <command_interface name="velocity"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+</joint>
+
+<joint name="rear_right_wheel_joint">
+    <command_interface name="velocity"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+</joint>
+
+</ros2_control>
+
+</xacro:macro>
+
+</robot>

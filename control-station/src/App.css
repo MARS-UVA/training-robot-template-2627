@@ -1,0 +1,139 @@
+.control-station {
+  text-align: left;
+}
+
+.control-station h1,
+.control-station h2 {
+  color: var(--heading);
+}
+
+.status-card {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.status-card.connected {
+  background-color: var(--connected);
+  color: #f0f0f0;
+}
+
+.status-card.disconnected {
+  background-color: var(--disconnected);
+  color: #f0f0f0;
+}
+
+.grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background-color: var(--card);
+  border-radius: 8px;
+  padding: 20px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.data-display {
+  font-family: monospace;
+  background: var(--data-bg);
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  color: var(--data-text);
+}
+
+.joystick-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.joystick {
+  position: relative;
+  border-radius: 50%;
+  background: var(--data-bg);
+  border: 2px solid var(--heading);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.joystick:active {
+  cursor: grabbing;
+}
+
+.joystick-pivot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--heading);
+  transform: translate(-50%, -50%);
+}
+
+.joystick-stem {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  background: var(--accent);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.joystick-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid #111;
+  pointer-events: none;
+}
+
+.joystick-readout {
+  font-family: ui-monospace, Consolas, monospace;
+  color: var(--data-text);
+}
+
+.control-station button {
+  background-color: var(--accent);
+  color: #111;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.control-station button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  color: #fff;
+}
+
+.control-station button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.action-error {
+  color: var(--disconnected);
+}

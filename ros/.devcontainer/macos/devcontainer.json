@@ -1,0 +1,47 @@
+{
+    "name": "ros \u2014 macOS",
+    "privileged": true,
+    "remoteUser": "diana",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "args": {
+            "USERNAME": "diana",
+            "USER_UID": "1000",
+            "USER_GID": "1000"
+        }
+    },
+    "workspaceFolder": "/home/ws/ros",
+    "workspaceMount": "source=${localWorkspaceFolder}/..,target=/home/ws,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes",
+                "twxs.cmake",
+                "donjayamanne.python-extension-pack",
+                "eamodio.gitlens",
+                "ms-iot.vscode-ros"
+            ]
+        }
+    },
+    "containerEnv": {
+        "DISPLAY": "${localEnv:ROS_DISPLAY:host.docker.internal:0}",
+        "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
+        "ROS_DOMAIN_ID": "42",
+        "RMW_IMPLEMENTATION": "rmw_zenoh_cpp",
+        "QT_X11_NO_MITSHM": "1"
+    },
+    "runArgs": [
+        "--net=host",
+        "--ipc=host"
+    ],
+    "forwardPorts": [
+        9090,
+        7447
+    ],
+    "postCreateCommand": [
+        "bash",
+        "-c",
+        "set -eo pipefail; source /opt/ros/jazzy/setup.bash; sudo apt-get update; (rosdep update || sudo rosdep update); sudo rosdep install --from-paths /home/ws/ros/src --ignore-src -r -y --rosdistro jazzy; cd /home/ws/ros; colcon build --symlink-install; LINE='source /home/ws/ros/setup-terminal.sh'; grep -qxF \"$LINE\" ~/.bashrc || echo \"$LINE\" >> ~/.bashrc"
+    ]
+}

@@ -1,0 +1,7 @@
+build/
+install/
+log/
+*.tar
+.vscode/
+*.db
+__pycache__/

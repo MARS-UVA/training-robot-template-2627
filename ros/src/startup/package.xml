@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>startup</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="edpaschke@gmail.com">xerix</maintainer>
+  <license>TODO: License declaration</license>
+
+  <depend>ros2_control</depend>
+  <depend>controller_manager</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>diff_drive_controller</depend>
+  <depend>joint_state_broadcaster</depend>
+  <depend>twist_mux</depend>
+  <depend>twist_stamper</depend>
+  <exec_depend>rmw_zenoh_cpp</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -1,0 +1,6 @@
+services:
+  training_robot:
+    build: .
+    privileged: true
+    stdin_open: true
+    tty: true

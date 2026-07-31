@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROS 2 Bridge Control Station</title>
+
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/eventemitter2@6.4.9/lib/eventemitter2.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e24;
+            color: #f0f0f0;
+            margin: 20px;
+        }
+
+        h1,
+        h2 {
+            color: #00adb5;
+        }
+
+        .status-card {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .connected {
+            background-color: #2e7d32;
+        }
+
+        .disconnected {
+            background-color: #c62828;
+        }
+
+        .grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: #2b2d42;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+            min-width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .data-display {
+            font-family: monospace;
+            background: #111;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #00ffcc;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        button {
+            background-color: #00adb5;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #00888e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>ROS 2 Bridge Control Panel</h1>
+    <div id="connection-status" class="status-card disconnected">Disconnected</div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Incoming Sensor Data</h2>
+            <p><strong>Topic:</strong> <code>/ultrasonic</code> and <code>/heading</code></p>
+            <div id="sensor-data-box" class="data-display">
+                Waiting for sensor data...
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Gamepad & Control Relayer</h2>
+            <p><strong>Topic:</strong> <code>/gamepad_state</code></p>
+
+            <div id="gamepad-status">
+                <em>No hardware gamepad detected. Connect a controller or use manual controls below.</em>
+            </div>
+
+            <br>
+
+            <div class="control-group">
+                <label for="left-stick-x">Left Stick X: <span id="val-lx">0.00</span></label>
+                <input type="range" id="left-stick-x" min="-1.0" max="1.0" step="0.05" value="0.0">
+            </div>
+
+            <div class="control-group">
+                <label for="left-stick-y">Left Stick Y: <span id="val-ly">0.00</span></label>
+                <input type="range" id="left-stick-y" min="-1.0" max="1.0" step="0.05" value="0.0">
+            </div>
+
+            <button onclick="sendGamepadState()">Publish Control State</button>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // ----------------------------------------------------
+        // 1. ROS 2 WebSocket Connection Setup
+        // ----------------------------------------------------
+        // Update URL to match your rosbridge_server WebSocket IP/Port
+        var ros = new ROSLIB.Ros({
+            url: 'ws://localhost:9090'
+        });
+
+        var statusCard = document.getElementById('connection-status');
+
+        ros.on('connection', function () {
+            statusCard.innerText = 'Connected to ROS 2 Bridge';
+            statusCard.className = 'status-card connected';
+        });
+
+        ros.on('error', function (error) {
+            statusCard.innerText = 'Connection Error';
+            statusCard.className = 'status-card disconnected';
+            console.error('WebSocket Error:', error);
+        });
+
+        ros.on('close', function () {
+            statusCard.innerText = 'Connection Closed';
+            statusCard.className = 'status-card disconnected';
+        });
+
+        // ----------------------------------------------------
+        // 2. Subscribe to Sensor Feedback (/ultrasonic)
+        // ----------------------------------------------------
+        var ultrasonicSubscriber = new ROSLIB.Topic({
+            ros: ros,
+            name: '/ultrasonic',
+            messageType: 'std_msgs/msg/Float64MultiArray'
+        });
+
+        var headingSubscriber = new ROSLIB.Topic({
+            ros: ros,
+            name: '/heading',
+            messageType: 'std_msgs/msg/Float64'
+        });
+
+        var data = {
+            ultrasonic: [],
+            heading: 0.0
+        };
+
+        ultrasonicSubscriber.subscribe(function (message) {
+            data.ultrasonic = message.data;
+            var dataBox = document.getElementById('sensor-data-box');
+            dataBox.innerHTML = '<pre>Ultrasonic Readings: ' + data.ultrasonic.map(d => d.toFixed(2)).join(', ') + '</pre>'
+                + '<pre>Heading: ' + data.heading.toFixed(2) + '</pre>';
+        });
+
+        headingSubscriber.subscribe(function (message) {
+            data.heading = message.data;
+            var dataBox = document.getElementById('sensor-data-box');
+            dataBox.innerHTML = '<pre>Ultrasonic Readings: ' + data.ultrasonic.map(d => d.toFixed(2)).join(', ') + '</pre>'
+                + '<pre>Heading: ' + data.heading.toFixed(2) + '</pre>';
+        });
+
+        // ----------------------------------------------------
+        // 3. Publisher for Gamepad State (/gamepad_state)
+        // ----------------------------------------------------
+        var gamepadPublisher = new ROSLIB.Topic({
+            ros: ros,
+            name: '/gamepad_state',
+            messageType: 'teleop_msgs/msg/GamepadState'
+        });
+
+        function sendGamepadState() {
+            var lx = parseFloat(document.getElementById('left-stick-x').value);
+            var ly = parseFloat(document.getElementById('left-stick-y').value);
+
+            var gamepadMsg = new ROSLIB.Message({
+                left_stick: {
+                    x: lx,
+                    y: ly
+                }
+            });
+
+            gamepadPublisher.publish(gamepadMsg);
+            console.log('Published Gamepad State:', gamepadMsg);
+        }
+
+        // UI Slider Event Listeners
+        document.getElementById('left-stick-x').addEventListener('input', function (e) {
+            document.getElementById('val-lx').innerText = parseFloat(e.target.value).toFixed(2);
+            sendGamepadState();
+        });
+
+        document.getElementById('left-stick-y').addEventListener('input', function (e) {
+            document.getElementById('val-ly').innerText = parseFloat(e.target.value).toFixed(2);
+            sendGamepadState();
+        });
+
+        // ----------------------------------------------------
+        // 4. Hardware Gamepad API Loop (Optional USB Gamepad Support)
+        // ----------------------------------------------------
+        window.addEventListener("gamepadconnected", (e) => {
+            document.getElementById('gamepad-status').innerHTML =
+                '<strong>Gamepad Connected:</strong> ' + e.gamepad.id;
+        });
+
+        function pollGamepad() {
+            var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+            if (gamepads[0]) {
+                var gp = gamepads[0];
+                var lx = gp.axes[0]; // Left stick X
+                var ly = -gp.axes[1]; // Left stick Y (inverted standard)
+
+                document.getElementById('left-stick-x').value = lx;
+                document.getElementById('left-stick-y').value = ly;
+                document.getElementById('val-lx').innerText = lx.toFixed(2);
+                document.getElementById('val-ly').innerText = ly.toFixed(2);
+
+                sendGamepadState();
+            }
+        }
+
+        // Poll hardware controller every 100ms
+        setInterval(pollGamepad, 100);
+
+    </script>
+</body>
+
+</html>
