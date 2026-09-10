@@ -1,4 +1,3 @@
-from threading import Thread
 from rclpy.node import Node
 from teleop_msgs.msg import GamepadState
 from geometry_msgs.msg import Twist
@@ -22,7 +21,7 @@ class TeleopInputStreamer(Node):
             callback_group=self.STREAM_CALLBACK_GROUP,
         )
         
-        self.current_twist = Twist()
+        self.current_twist = None
         self.start_keep_alive()
 
     def teleop_callback(self, gamepad_input: GamepadState):
@@ -41,20 +40,8 @@ class TeleopInputStreamer(Node):
     # the board disengages motors after no input is recieved in ~1s
     # we should replay inputs every 0.5s to keep unchanging inputs live
     def start_keep_alive(self):
-        KEEP_ALIVE_RATE = self.create_rate(2.0)
-        
-        def keep_alive():
-            previous_twist = None
-            
-            while True:
-                is_twist_empty = self.current_twist == None or self.current_twist == Twist()
-                if not is_twist_empty:
-                    if self.current_twist != previous_twist:
-                        previous_twist = self.current_twist
-                    else:
-                        self.twist_publisher.publish(self.current_twist)
-                
-                KEEP_ALIVE_RATE.sleep()
-        
-        # thread to avoid halting
-        Thread(target=keep_alive).start()
+        self.create_timer(0.5, self.keep_alive)
+    
+    def keep_alive(self):
+        if self.current_twist is not None and self.current_twist is not Twist():
+            self.twist_publisher.publish(self.current_twist)
