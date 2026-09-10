@@ -1,5 +1,5 @@
 import rclpy
-from teleop_streamer.TeleopInputStreamer import TeleopInputStreamer
+from teleop_streamer.teleop_input_streamer import TeleopInputStreamer
 from rclpy.executors import MultiThreadedExecutor
 
 def main(args=None):

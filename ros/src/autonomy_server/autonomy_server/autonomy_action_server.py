@@ -1,4 +1,4 @@
-from rclpy.action import ActionServer
+from rclpy.action import ActionServer, CancelResponse
 from rclpy.node import Node
 from autonomy_interfaces.action import AutonomousActions
 from std_msgs.msg import Float64, Float64MultiArray
@@ -152,4 +152,4 @@ class AutonomyActionServer(Node):
     def cancel_callback(self, goal_handle):
         self.get_logger().info('Canceling goal...')
         self.stop_robot()
-        return rclpy.action.CancelResponse.ACCEPT
+        return CancelResponse.ACCEPT
