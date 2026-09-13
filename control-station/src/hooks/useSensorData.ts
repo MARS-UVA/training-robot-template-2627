@@ -10,6 +10,25 @@ export type SensorData = {
   received: boolean
 }
 
+export function writeMockSensorData(ros: Ros | null, data: SensorData) {
+  if (!ros) return
+
+  const headingPublish = new Topic<Float64>({
+    ros,
+    name: '/heading',
+    messageType: 'std_msgs/msg/Float64',
+  })
+
+  const ultrasonicPublish = new Topic<Float64MultiArray>({
+    ros,
+    name: '/ultrasonic',
+    messageType: 'std_msgs/msg/Float64MultiArray',
+  })
+
+  headingPublish.publish({ data: data.heading });
+  ultrasonicPublish.publish({ data: data.ultrasonic })
+}
+
 export function useSensorData(ros: Ros | null) {
   const [data, setData] = useState<SensorData>({
     ultrasonic: [],
@@ -21,12 +40,20 @@ export function useSensorData(ros: Ros | null) {
     if (!ros) return
 
     // TODO: Create subscriber to /ultrasonic
-    const ultrasonicSubscriber = null
+    const ultrasonicSubscriber = new Topic<Float64MultiArray>({
+      ros,
+      name: '/ultrasonic',
+      messageType: 'std_msgs/msg/Float64MultiArray',
+    })
 
     const headingSubscriber = new Topic<Float64>({
       ros,
       name: '/heading',
       messageType: 'std_msgs/msg/Float64',
+    })
+
+    ultrasonicSubscriber.subscribe((message) => {
+      setData((prev) => ({ ...prev, ultrasonic: message.data, received: true }))
     })
 
     headingSubscriber.subscribe((message) => {
@@ -35,6 +62,7 @@ export function useSensorData(ros: Ros | null) {
 
     return () => {
       headingSubscriber.unsubscribe()
+      ultrasonicSubscriber.unsubscribe()
     }
   }, [ros])
 

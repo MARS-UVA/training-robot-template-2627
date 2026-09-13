@@ -21,8 +21,6 @@ function App() {
       <ConnectionStatus status={status} />
 
       <div className="grid">
-        {/* TODO: Add the SensorDataCard and use the sensorData */}
-
         <GamepadControlCard
           leftStick={leftStick}
           gamepadName={gamepadName}
@@ -37,6 +35,10 @@ function App() {
           error={autonomy.error}
           onSendGoal={autonomy.sendGoal}
           onCancel={autonomy.cancelGoal}
+        />
+        <SensorDataCard
+          data={sensorData}
+          ros={ros}
         />
       </div>
     </main>
