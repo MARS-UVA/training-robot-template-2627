@@ -8,6 +8,14 @@ type Props = {
 }
 
 export function SensorDataCard({ data, ros }: Props) {
+  // Safe ultrasonic readings with L/F/R labels
+  const ultra = data.ultrasonic
+  const left = ultra.length > 0 ? ultra[0] : NaN
+  const front = ultra.length > 1 ? ultra[1] : NaN
+  const right = ultra.length > 2 ? ultra[2] : NaN
+
+  const numberOrNone = (v: number) => Number.isNaN(v) ? '—' : v.toFixed(2)
+
   return (
     <div className="card">
       <h2>Incoming Sensor Data</h2>
@@ -35,8 +43,8 @@ export function SensorDataCard({ data, ros }: Props) {
         </button>
         <button type="button" onClick={() => {
           // enter a separate thread
-          let interval: number;
-          let i = 0;
+          let interval: number
+          let i = 0
           interval = setInterval(() => {
             const turn: SensorData = {
               ultrasonic: data.ultrasonic,
@@ -44,20 +52,22 @@ export function SensorDataCard({ data, ros }: Props) {
               received: true
             }
             writeMockSensorData(ros, turn)
-            if (i == 45) clearInterval(interval);
+            if (i == 45) clearInterval(interval)
           }, 8)
         }}>
           Mock Turn 90deg
         </button>
       </div>
-      <div className="data-display">
-        ultrasonic: {data.ultrasonic.toString()}
-        <br />
-        heading: {data.heading}
-        <br />
-        <SensorDataDrawing data={data}></SensorDataDrawing>
-      </div>
 
+      <div className="data-display">
+        <div className="data-text">
+          <div>L/F/R: {numberOrNone(left)}, {numberOrNone(front)}, {numberOrNone(right)}</div>
+          <div>heading: {data.heading.toFixed(2)}</div>
+        </div>
+        <div className="sensor-canvas">
+          <SensorDataDrawing data={data} />
+        </div>
+      </div>
     </div>
   )
 }

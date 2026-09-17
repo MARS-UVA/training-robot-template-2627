@@ -154,5 +154,12 @@ def generate_launch_description():
             package="teleop_streamer",
             executable="teleop_input_streamer",
             output="screen"
+        ),
+        
+        # e_stop!
+        Node(
+            package="emergency_stop",
+            executable="emergency_stop_service",
+            output="screen"
         )
     ])

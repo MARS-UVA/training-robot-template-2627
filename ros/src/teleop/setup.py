@@ -24,7 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'teleop_input_streamer = teleop_streamer.start_node:main',
+            'teleop_input_streamer = teleop.start_node:main',
         ],
     },
 )

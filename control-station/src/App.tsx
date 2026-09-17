@@ -1,5 +1,6 @@
 import { AutonomousActionCard } from './components/AutonomousActionCard'
 import { ConnectionStatus } from './components/ConnectionStatus'
+import { EmergencyStopCard } from "./components/EmergencyStopCard"
 import { GamepadControlCard } from './components/GamepadControlCard'
 import { SensorDataCard } from './components/SensorDataCard'
 import { useAutonomousAction } from './hooks/useAutonomousAction'
@@ -36,8 +37,13 @@ function App() {
           onSendGoal={autonomy.sendGoal}
           onCancel={autonomy.cancelGoal}
         />
+
         <SensorDataCard
           data={sensorData}
+          ros={ros}
+        />
+
+        <EmergencyStopCard
           ros={ros}
         />
       </div>

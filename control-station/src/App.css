@@ -47,6 +47,21 @@
   max-height: 200px;
   overflow-y: auto;
   color: var(--data-text);
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.data-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+.sensor-canvas {
+  flex-shrink: 0;
 }
 
 .joystick-wrap {

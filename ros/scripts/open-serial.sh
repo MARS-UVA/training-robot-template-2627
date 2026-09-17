@@ -1,0 +1,1 @@
+socat TCP-LISTEN:7777,bind=0.0.0.0,reuseaddr,fork /dev/cu.usbserial-10,ispeed=115200,ospeed=115200,raw,echo=0,clocal=1,crtscts=0

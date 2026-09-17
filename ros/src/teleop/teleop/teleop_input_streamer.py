@@ -9,8 +9,8 @@ class TeleopInputStreamer(Node):
         super().__init__("teleop_input_streamer")
 
         self.gamepad_subscriber = self.create_subscription(
-            topic="/gamepad_state",
             msg_type=GamepadState,
+            topic="/gamepad_state",
             callback=self.teleop_callback,
             qos_profile=10,
         )

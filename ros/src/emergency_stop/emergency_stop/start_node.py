@@ -1,20 +1,20 @@
 import rclpy
-from teleop_streamer.teleop_input_streamer import TeleopInputStreamer
+from emergency_stop.emergency_stop_service import EmergencyStopService
 from rclpy.executors import MultiThreadedExecutor
 
 def main(args=None):
     rclpy.init(args=args)
 
-    teleop_action_server = TeleopInputStreamer()
+    emergency_stop_service = EmergencyStopService()
 
     executor = MultiThreadedExecutor()
-    executor.add_node(teleop_action_server)
+    executor.add_node(emergency_stop_service)
 
     try:
         executor.spin()
     finally:
         executor.shutdown()
-        teleop_action_server.destroy_node()
+        emergency_stop_service.destroy_node()
         rclpy.shutdown()
 
 
