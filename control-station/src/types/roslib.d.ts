@@ -30,4 +30,17 @@ declare module 'roslib' {
     ): string
     cancelGoal(id: string): void
   }
+
+  export class Service<TRequest = unknown, TResponse = unknown> {
+    constructor(options: {
+      ros: Ros,
+      name: string,
+      serviceType: string
+    })
+    callService(
+      request: TRequest,
+      successCallback: (response: TResponse) => void,
+      failedCallback?: (error: string) => void
+    ): void
+  }
 }
