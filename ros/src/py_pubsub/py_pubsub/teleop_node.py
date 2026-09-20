@@ -4,9 +4,9 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
 from teleop_msgs.msg import GamepadState
-    
 
-class TeleopNode(Node):
+
+class TeleopNode(Node): 
 
     def __init__(self):
         super().__init__('teleop_node')

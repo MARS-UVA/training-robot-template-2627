@@ -25,6 +25,7 @@ setup(
     entry_points={
     'console_scripts': [
         'teleop_node = py_pubsub.teleop_node:main',
+        'sensor_node = py_pubsub.sensor_node:main',
         ],
     },
 )
