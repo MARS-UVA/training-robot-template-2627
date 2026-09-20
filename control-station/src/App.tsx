@@ -22,7 +22,9 @@ function App() {
 
       <div className="grid">
         {/* TODO: Add the SensorDataCard and use the sensorData */}
-
+        <SensorDataCard
+          data={sensorData}
+        ></SensorDataCard>
         <GamepadControlCard
           leftStick={leftStick}
           gamepadName={gamepadName}

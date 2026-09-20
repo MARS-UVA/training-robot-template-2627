@@ -49,6 +49,65 @@
   color: var(--data-text);
 }
 
+.sensor-map {
+  position: relative;
+  height: 260px;
+  margin: 18px 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--heading) 30%, transparent);
+  border-radius: 6px;
+  background: radial-gradient(circle at center, #1d2b50 0, #0b1227 68%);
+}
+
+.sensor-wall {
+  position: absolute;
+  z-index: 1;
+  background: var(--accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.sensor-wall-left,
+.sensor-wall-right {
+  top: calc(50% - 52px);
+  height: 104px;
+  width: 7px;
+}
+
+.sensor-wall-left {
+  left: calc(50% - 31px - 7px - var(--left-gap));
+}
+
+.sensor-wall-right {
+  left: calc(50% + 31px + var(--right-gap));
+}
+
+.sensor-wall-front {
+  top: calc(48% - 48px - 7px - var(--front-gap));
+  left: calc(50% - 52px);
+  width: 104px;
+  height: 7px;
+}
+
+.sensor-robot {
+  position: absolute;
+  z-index: 2;
+  top: 48%;
+  left: 50%;
+  width: 62px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--heading);
+  border-radius: 5px;
+  background: var(--connected);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--connected) 50%, transparent);
+}
+
 .joystick-wrap {
   display: flex;
   flex-direction: column;
