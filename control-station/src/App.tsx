@@ -21,7 +21,7 @@ function App() {
       <ConnectionStatus status={status} />
 
       <div className="grid">
-        {/* TODO: Add the SensorDataCard and use the sensorData */}
+        <SensorDataCard data={sensorData} />
 
         <GamepadControlCard
           leftStick={leftStick}
