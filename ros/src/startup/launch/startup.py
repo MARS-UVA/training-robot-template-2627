@@ -148,5 +148,12 @@ def generate_launch_description():
             executable="autonomy_action_server",
             output="screen",
         
+        ),
+        # Starts the teleop node
+        Node(
+            package="teleop",
+            executable="listener",
+            output="screen",
+            
         )
     ])
