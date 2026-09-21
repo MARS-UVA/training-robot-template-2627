@@ -52,6 +52,9 @@ export function AutonomousActionCard({
         <button type="button" disabled={busy} onClick={() => onSendGoal(1)}>
           Drive until obstacle
         </button>
+        <button type="button" disabled={busy} onClick={() => onSendGoal(2)}>
+          Solve Maze
+        </button>
         <button type="button" disabled={!busy} onClick={onCancel}>
           Cancel
         </button>

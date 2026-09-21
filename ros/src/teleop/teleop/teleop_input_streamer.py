@@ -9,8 +9,8 @@ class TeleopInputStreamer(Node):
         super().__init__("teleop_input_streamer")
 
         self.gamepad_subscriber = self.create_subscription(
-            msg_type=GamepadState,
             topic="/gamepad_state",
+            msg_type=GamepadState,
             callback=self.teleop_callback,
             qos_profile=10,
         )
@@ -23,12 +23,10 @@ class TeleopInputStreamer(Node):
     def teleop_callback(self, gamepad_input: GamepadState):
         # x will be our motor turn radius, [-1, 1]
         # y will be our motor strength scalar, [-1, 1]
-        direction = (gamepad_input.left_stick.x, gamepad_input.left_stick.y)
-
         # this just happens to adapt pretty well with the gamepad input
         twist = Twist()
-        twist.linear.x = direction[1] # fwd = y
-        twist.angular.z = direction[0] # turn = x
+        twist.linear.x = gamepad_input.left_stick.y  # fwd = y
+        twist.angular.z = gamepad_input.left_stick.x  # turn = x
 
         self.twist_publisher.publish(twist)
         self.current_twist = twist

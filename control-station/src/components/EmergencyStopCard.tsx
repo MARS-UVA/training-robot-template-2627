@@ -1,8 +1,12 @@
 import { useState } from 'react'
-import { Ros, Service } from 'roslib'
+import { Ros, Service, Topic } from 'roslib'
 
 type EmergencyStop = {
-	mux_locked: boolean
+	set_lock_to: boolean
+}
+
+type Bool = {
+	data: boolean
 }
 
 type Props = {
@@ -10,8 +14,21 @@ type Props = {
 }
 
 export function EmergencyStopCard({ ros }: Props) {
-	let [isMuxLocked, setMuxLocked] = useState(false)
-	let [pending, setPending] = useState(false)
+	const [isLocked, setMuxLocked] = useState(false)
+	const [subscriberExists, setSubscriberExists] = useState(false)
+
+	const eStopStatus = new Topic<Bool>({
+		ros,
+		name: '/e_stop_status',
+		messageType: 'std_msgs/msg/Bool'
+	})
+
+	if (!subscriberExists) {
+		eStopStatus.subscribe((msg) => {
+			setMuxLocked(msg.data)
+		})
+		setSubscriberExists(true)
+	}
 
 	return (
 		<div className="card">
@@ -22,22 +39,16 @@ export function EmergencyStopCard({ ros }: Props) {
 			<strong>Topic:</strong> <code>/e_stop</code>, locks <code>/cmd_vel</code>
 			<br />
 			<div className="button-row">
-				<button type="button" disabled={pending} onClick={() => {
+				<button type="button" onClick={() => {
 					const eStopService = new Service<EmergencyStop>({
 						ros,
 						name: '/emergency_stop',
 						serviceType: 'emergency_stop_interfaces/srv/EmergencyStop',
 					})
 
-					setPending(true)
-					eStopService.callService({ mux_locked: !isMuxLocked }, () => {
-						setMuxLocked(!isMuxLocked)
-						setPending(false)
-					}, () => {
-						setPending(false)
-					})
+					eStopService.callService({ set_lock_to: !isLocked }, (res) => { console.log(res) })
 				}}>
-					{isMuxLocked ? "Unlock" : "Lock"} /cmd_vel
+					{isLocked ? "Unlock" : "Lock"} /cmd_vel
 				</button>
 			</div>
 		</div>
