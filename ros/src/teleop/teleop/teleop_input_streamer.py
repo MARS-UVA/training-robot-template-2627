@@ -26,7 +26,7 @@ class TeleopInputStreamer(Node):
         # this just happens to adapt pretty well with the gamepad input
         twist = Twist()
         twist.linear.x = gamepad_input.left_stick.y  # fwd = y
-        twist.angular.z = gamepad_input.left_stick.x  # turn = x
+        twist.angular.z = -gamepad_input.left_stick.x  # turn = x
 
         self.twist_publisher.publish(twist)
         self.current_twist = twist
