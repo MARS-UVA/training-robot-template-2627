@@ -14,7 +14,7 @@ class MinimalSubscriber(Node):
             10)
         self.subscription  # prevent unused variable warning
         self.sensitivity = sensitivity
-        self.twist_publisher = self.create_publisher(Twist, '/autonomy/cmd_vel', 10)
+        self.twist_publisher = self.create_publisher(Twist, '/teleop/cmd_vel', 10)
 
     def convert_gamepad_to_twist(self, x, y):
         twist_msg = Twist()

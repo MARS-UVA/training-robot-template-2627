@@ -155,5 +155,11 @@ def generate_launch_description():
             executable="listener",
             output="screen",
             
-        )
+        ),
+        # Start the software estop service
+        Node(
+            package="software_estop",
+            executable="service",
+            output="screen",
+        ),
     ])
