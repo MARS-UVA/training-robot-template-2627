@@ -151,7 +151,7 @@ def generate_launch_description():
         
         # teleop!
         Node(
-            package="teleop_streamer",
+            package="teleop",
             executable="teleop_input_streamer",
             output="screen"
         ),

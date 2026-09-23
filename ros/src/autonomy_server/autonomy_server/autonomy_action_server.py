@@ -100,26 +100,34 @@ class AutonomyActionServer(Node):
 
             yield False
 
-    def follow_wall_right_iterator(self, fwd_threshold=30, right_threshold=20):
+    
+    def follow_wall_right_autobalancing(self, fwd_threshold=30, right_attach_distance=30):
         while rclpy.ok():
-            twist_msg = Twist()
-            twist_msg.linear.x = 0.1
-
-            front_distance, right_distance = (
+            left_distance, front_distance, right_distance = (
+                self.ultrasonic_data[0],
                 self.ultrasonic_data[1],
                 self.ultrasonic_data[2],
             )
+
+            twist_msg = Twist()
+            twist_msg.linear.x = 0.1
+            
+            # smoothing for position
+            # arbitrary scale
+            twist_msg.angular.z = (right_distance - right_attach_distance) / 100 # arbitrary
+
             if front_distance < fwd_threshold:
                 self.stop_robot()
                 return True
 
-            if right_distance < right_threshold:
+            if right_distance < right_attach_distance:
                 self.stop_robot()
                 return True
 
             self.twist_publisher.publish(twist_msg)
 
             yield False
+
 
     def solve_maze(self, right_threshold=100):  # follow wall right
         while rclpy.ok():

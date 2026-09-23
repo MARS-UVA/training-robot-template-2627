@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'teleop_streamer'
+package_name = 'teleop'
 
 setup(
     name=package_name,
