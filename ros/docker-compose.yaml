@@ -4,3 +4,7 @@ services:
     privileged: true
     stdin_open: true
     tty: true
+    network_mode: host
+    env_file:
+      - .env
+
