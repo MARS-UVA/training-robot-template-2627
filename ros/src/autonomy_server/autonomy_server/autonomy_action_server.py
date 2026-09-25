@@ -1,3 +1,5 @@
+from time import sleep
+
 from rclpy.action import ActionServer, CancelResponse
 from rclpy.node import Node
 from autonomy_interfaces.action import AutonomousActions
@@ -70,13 +72,13 @@ class AutonomyActionServer(Node):
             error = (
                 target_heading - self.heading_data + 180
             ) % 360 - 180  # Calculate shortest angle difference
-            if abs(error) < 5:  # Allowable error margin
+            if abs(error) < 2:  # Allowable error margin
                 self.stop_robot()
                 self.get_logger().info("Target heading reached. Stopping the robot.")
                 return True
 
             twist_msg = Twist()
-            twist_msg.angular.z = (-1 if error > 0 else 1) * 0.5
+            twist_msg.angular.z = (-1 if error > 0 else 1) * 0.2
             self.twist_publisher.publish(twist_msg)
 
             self.get_logger().info(
@@ -94,52 +96,46 @@ class AutonomyActionServer(Node):
                 return True
 
             twist_msg = Twist()
-            twist_msg.linear.x = 0.1
+            twist_msg.linear.x = 0.02
 
             self.twist_publisher.publish(twist_msg)
 
             yield False
 
+    def move_forward_until_obstacle_or_rwall(self, distance_threshold=30.0):
+            while rclpy.ok():
+                front_distance = self.ultrasonic_data[1]
+                if front_distance < distance_threshold:
+                    self.stop_robot()
+                    self.get_logger().info("Obstacle detected. Stopping the robot.")
+                    return True
+                
+                right_distance = self.ultrasonic_data[2]
+                
+                if right_distance > distance_threshold:
+                    self.stop_robot()
+                    self.get_logger().info("RIght not detected. Stopping the robot.")
+                    return True
     
-    def follow_wall_right_autobalancing(self, fwd_threshold=30, right_attach_distance=20):
+                twist_msg = Twist()
+                twist_msg.linear.x = 0.02
+    
+                self.twist_publisher.publish(twist_msg)
+    
+                yield False
+
+    def solve_maze(self, right_threshold=40):  # follow wall right
         while rclpy.ok():
-            front_distance, right_distance = (
-                self.ultrasonic_data[1],
-                self.ultrasonic_data[2],
-            )
-
-            twist_msg = Twist()
-            twist_msg.linear.x = 0.1
-            
-            # smoothing for position
-            # arbitrary scale
-            twist_msg.angular.z = (right_distance - right_attach_distance) / 100 # arbitrary
-
-            if front_distance < fwd_threshold:
-                self.stop_robot()
-                return True
-
-            if right_distance > right_attach_distance * 3:
-                self.stop_robot()
-                return True
-
-            self.twist_publisher.publish(twist_msg)
-
-            yield False
-
-
-    def solve_maze(self, right_threshold=100):  # follow wall right
-        while rclpy.ok():
-            yield from self.follow_wall_right_autobalancing(right_attach_distance=right_threshold)
+            yield from self.move_forward_until_obstacle_or_rwall()
             left, front, right = (
                 self.ultrasonic_data[0],
                 self.ultrasonic_data[1],
                 self.ultrasonic_data[2],
             )
             if right < right_threshold:
-                yield from self.turn(-90)
-            else:
                 yield from self.turn(90)
+            else:
+                yield from self.turn(-90)
             yield False
 
     def execute_callback(self, goal_handle):
