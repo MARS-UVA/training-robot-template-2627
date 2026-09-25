@@ -121,7 +121,7 @@ hardware_interface::return_type RobotSerialHardware::read(const rclcpp::Time &, 
     std_msgs::msg::Float64MultiArray ultrasonic_msg;
     // TODO: populate the ultrasonic_msg with the feedback data sent by the serial and publish the message
 
-    ultrasonic_msg.data = feedback.ultrasonic;
+    ultrasonic_msg.data = {feedback.left_ultrasonic, feedback.front_ultrasonic, feedback.right_ultrasonic};
     ultrasonic_pub_->publish(ultrasonic_msg);
 
     return hardware_interface::return_type::OK;
