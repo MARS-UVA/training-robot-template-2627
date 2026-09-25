@@ -133,9 +133,9 @@ class AutonomyActionServer(Node):
                 self.ultrasonic_data[2],
             )
             if right < right_threshold:
-                yield from self.turn(90)
-            else:
                 yield from self.turn(-90)
+            else:
+                yield from self.turn(90)
             yield False
 
     def execute_callback(self, goal_handle):
