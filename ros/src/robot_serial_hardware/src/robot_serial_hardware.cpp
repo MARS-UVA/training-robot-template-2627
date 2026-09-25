@@ -23,6 +23,11 @@ hardware_interface::CallbackReturn RobotSerialHardware::on_init(
     );
 
     // TODO: create a publisher to publish /ultrasonic sensor data
+    ultrasonic_pub_ = get_node()->create_publisher<std_msgs::msg::Float64MultiArray>(
+        "/ultrasonic",
+        rclcpp::QoS(10)
+    );
+
 
     auto port = info.hardware_parameters.at("port");
     auto baud = std::stoi(info.hardware_parameters.at("baudrate"));
@@ -115,6 +120,9 @@ hardware_interface::return_type RobotSerialHardware::read(const rclcpp::Time &, 
 
     std_msgs::msg::Float64MultiArray ultrasonic_msg;
     // TODO: populate the ultrasonic_msg with the feedback data sent by the serial and publish the message
+
+    ultrasonic_msg.data = feedback.ultrasonic;
+    ultrasonic_pub_->publish(ultrasonic_msg);
 
     return hardware_interface::return_type::OK;
 }
