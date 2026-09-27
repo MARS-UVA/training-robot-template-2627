@@ -7,10 +7,14 @@ import { useGamepadPublisher } from './hooks/useGamepadPublisher'
 import { useRos } from './hooks/useRos'
 import { useSensorData } from './hooks/useSensorData'
 import './App.css'
+import { useEstopActiveData, useEstopCaller } from './hooks/useEstopData'
+import { EstopControlCard } from './components/EstopControlCard'
 
 function App() {
   const { ros, status } = useRos()
   const sensorData = useSensorData(ros)
+  const estopData = useEstopActiveData(ros)
+  const estopCaller = useEstopCaller(ros)
   const { leftStick, applyStick, releaseStick, gamepadName, wasdActive } =
     useGamepadPublisher(ros)
   const autonomy = useAutonomousAction(ros)
@@ -38,6 +42,8 @@ function App() {
           onSendGoal={autonomy.sendGoal}
           onCancel={autonomy.cancelGoal}
         />
+
+        <EstopControlCard data={estopData} caller={estopCaller} />
       </div>
     </main>
   )
