@@ -16,6 +16,23 @@ declare module 'roslib' {
     publish(message: TMessage): void
   }
 
+  export class ServiceRequest<TRequest = unknown> {
+    constructor(request: TRequest)
+  }
+
+  export class Service<TRequest = unknown, TResponse = unknown> {
+    constructor(options: {
+      ros: Ros
+      name: string
+      serviceType: string
+    })
+    callService(
+      request: ServiceRequest<TRequest>,
+      successCallback?: (response: TResponse) => void,
+      errorCallback?: (error: unknown) => void,
+    ): void
+  }
+
   export class Action<TGoal = unknown, TResult = unknown, TFeedback = unknown> {
     constructor(options: {
       ros: Ros

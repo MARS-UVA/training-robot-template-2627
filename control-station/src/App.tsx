@@ -7,6 +7,7 @@ import { useGamepadPublisher } from './hooks/useGamepadPublisher'
 import { useRos } from './hooks/useRos'
 import { useSensorData } from './hooks/useSensorData'
 import './App.css'
+import EstopButton from './components/EstopButton'
 
 function App() {
   const { ros, status } = useRos()
@@ -22,6 +23,9 @@ function App() {
 
       <div className="grid">
         {/* TODO: Add the SensorDataCard and use the sensorData */}
+        <EstopButton>
+          ros = {ros}
+        </EstopButton>
         <SensorDataCard
           data={sensorData}
         ></SensorDataCard>
