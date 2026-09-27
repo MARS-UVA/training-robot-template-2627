@@ -11,7 +11,7 @@ class EstopService(Node):
 
     def __init__(self):
         super().__init__('estop_service')
-        self.srv = self.create_service(SoftwareEstop, 'estop_robot', self.e_stop)
+        self.srv = self.create_service(SoftwareEstop, 'estop_robot', self.estop)
         self.pub = self.create_publisher(Bool, '/e_stop', 10)
         self.keepStopPub = self.create_publisher(Bool, '/e_stop_active', 500)
         #client 
@@ -27,16 +27,19 @@ class EstopService(Node):
 
     def estop(self, request, response):
         msg = Bool()
-        msg.data = request.data
+        msg.data = request.enable
         self.pub.publish(msg)
         return response
     
     def keepStop(self, status):
         stats = status.status
-        if stats["locks"]["emergency_stop"] == "locked":
-            msg = Bool()
-            msg.data = True
-            self.keepStopPub.publish(msg)
+        for stat in status.status:
+            if stat.name == "locks":
+                for kv in stat.values:
+                    if kv.key == "emergency_stop" and kv.value == "locked":
+                        msg = Bool()
+                        msg.data = True
+                        self.keepStopPub.publish(msg)
         else:
             msg = Bool()
             msg.data = False
