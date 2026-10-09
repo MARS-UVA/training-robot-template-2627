@@ -1,0 +1,3 @@
+bool enable     # true to engage the emergency stop; false to release it
+---
+bool success    # true if the service successfully processed and dispatched the request
