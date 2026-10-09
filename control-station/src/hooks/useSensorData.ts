@@ -21,7 +21,15 @@ export function useSensorData(ros: Ros | null) {
     if (!ros) return
 
     // TODO: Create subscriber to /ultrasonic
-    const ultrasonicSubscriber = null
+    const ultrasonicSubscriber = new Topic<Float64MultiArray>({
+      ros,
+      name: '/ultrasonic',
+      messageType: 'std_msgs/msg/Float64MultiArray'
+    })
+
+    ultrasonicSubscriber.subscribe((msg) => {
+      setData((prev) => ({ ...prev, ultrasonic: msg.data, received: true }))
+    })
 
     const headingSubscriber = new Topic<Float64>({
       ros,
@@ -29,11 +37,12 @@ export function useSensorData(ros: Ros | null) {
       messageType: 'std_msgs/msg/Float64',
     })
 
-    headingSubscriber.subscribe((message) => {
-      setData((prev) => ({ ...prev, heading: message.data, received: true }))
+    headingSubscriber.subscribe((msg) => {
+      setData((prev) => ({ ...prev, heading: msg.data, received: true }))
     })
 
     return () => {
+      ultrasonicSubscriber.unsubscribe()
       headingSubscriber.unsubscribe()
     }
   }, [ros])

@@ -21,7 +21,9 @@ function App() {
       <ConnectionStatus status={status} />
 
       <div className="grid">
-        {/* TODO: Add the SensorDataCard and use the sensorData */}
+        <SensorDataCard
+          data={sensorData}
+        />
 
         <GamepadControlCard
           leftStick={leftStick}
@@ -30,6 +32,7 @@ function App() {
           onMove={applyStick}
           onRelease={releaseStick}
         />
+        
         <AutonomousActionCard
           status={autonomy.status}
           result={autonomy.result}
