@@ -80,6 +80,7 @@ def generate_launch_description():
                 {"robot_description": robot_description},
                 controller_config
             ],
+            arguments=["--ros-args", "--log-level", "error"],
             output="screen",
         ),
 

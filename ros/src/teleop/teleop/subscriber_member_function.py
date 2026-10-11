@@ -5,7 +5,7 @@ from teleop_msgs.msg import GamepadState
 from geometry_msgs.msg import Twist
 
 class MinimalSubscriber(Node):
-    def __init__(self, sensitivity=1.0):
+    def __init__(self, sensitivity=0.15):
         super().__init__('minimal_subscriber')
         self.subscription = self.create_subscription(
             GamepadState,
@@ -31,7 +31,7 @@ class MinimalSubscriber(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = MinimalSubscriber(0.1)
+    minimal_subscriber = MinimalSubscriber()
 
     rclpy.spin(minimal_subscriber)
 
