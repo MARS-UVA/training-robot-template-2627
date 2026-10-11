@@ -23,9 +23,7 @@ function App() {
 
       <div className="grid">
         {/* TODO: Add the SensorDataCard and use the sensorData */}
-        <EstopButton>
-          ros = {ros}
-        </EstopButton>
+        <EstopButton ros={ros} />
         <SensorDataCard
           data={sensorData}
         ></SensorDataCard>
@@ -38,6 +36,7 @@ function App() {
         />
         <AutonomousActionCard
           status={autonomy.status}
+          goalIndex={autonomy.goalIndex}
           result={autonomy.result}
           feedback={autonomy.feedback}
           error={autonomy.error}

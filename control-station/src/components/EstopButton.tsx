@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Topic, Service, ServiceRequest, type Ros } from 'roslib'
+import { Topic, Service, type Ros } from 'roslib'
 
 type Bool = {
   data: boolean
@@ -14,8 +14,8 @@ interface EstopButtonProps {
 }
 
 export default function EstopButton({ ros }: EstopButtonProps) {
-  const [estopActive, setEstopActive] = useState(false)
-  const [received, setReceived] = useState(false)
+  const [estopActive, setEstopActive] = useState<boolean | null>(null)
+  const [requestPending, setRequestPending] = useState(false)
 
   useEffect(() => {
     if (!ros) return
@@ -28,7 +28,6 @@ export default function EstopButton({ ros }: EstopButtonProps) {
 
     estopSubscriber.subscribe((message) => {
       setEstopActive(message.data)
-      setReceived(true)
     })
 
     return () => {
@@ -37,7 +36,10 @@ export default function EstopButton({ ros }: EstopButtonProps) {
   }, [ros])
 
   const toggleEstop = () => {
-    if (!ros) return
+    if (!ros || requestPending) return
+
+    const nextState = estopActive !== true
+    setRequestPending(true)
 
     const service = new Service<SoftwareEstopRequest, unknown>({
       ros,
@@ -45,19 +47,19 @@ export default function EstopButton({ ros }: EstopButtonProps) {
       serviceType: 'software_estop_srv/srv/SoftwareEstop',
     })
 
-    const request = new ServiceRequest<SoftwareEstopRequest>({
-      enable: !estopActive,
-    })
+    const request: SoftwareEstopRequest = {
+      enable: nextState,
+    }
 
     service.callService(
       request,
       () => {
-        console.log(
-          `E-stop ${!estopActive ? 'engaged' : 'cleared'}`
-        )
+        setEstopActive(nextState)
+        setRequestPending(false)
       },
-      (error: unknown) => {
+      (error) => {
         console.error('Failed to call estop service:', error)
+        setRequestPending(false)
       }
     )
   }
@@ -78,10 +80,10 @@ export default function EstopButton({ ros }: EstopButtonProps) {
         Status:{' '}
         <strong
           style={{
-            color: estopActive ? 'red' : 'green',
+            color: estopActive === null ? 'inherit' : estopActive ? 'red' : 'green',
           }}
         >
-          {!received
+          {estopActive === null
             ? 'Unknown'
             : estopActive
             ? 'ENGAGED'
@@ -91,7 +93,7 @@ export default function EstopButton({ ros }: EstopButtonProps) {
 
       <button
         onClick={toggleEstop}
-        disabled={!ros}
+        disabled={!ros || requestPending}
         style={{
           backgroundColor: estopActive ? 'green' : 'red',
           color: 'white',
@@ -102,7 +104,7 @@ export default function EstopButton({ ros }: EstopButtonProps) {
           fontWeight: 'bold',
         }}
       >
-        {estopActive ? 'Clear E-Stop' : 'ENGAGE E-Stop'}
+        {estopActive === true ? 'Clear E-Stop' : 'ENGAGE E-Stop'}
       </button>
     </div>
   )

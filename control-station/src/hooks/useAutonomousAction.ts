@@ -34,6 +34,7 @@ export function useAutonomousAction(ros: Ros | null) {
   const goalIdRef = useRef<string | null>(null)
 
   const [status, setStatus] = useState<ActionStatus>('idle')
+  const [goalIndex, setGoalIndex] = useState<number | null>(null)
   const [result, setResult] = useState<AutonomousActionResult | null>(null)
   const [feedback, setFeedback] = useState<AutonomousActionFeedback | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -61,6 +62,7 @@ export function useAutonomousAction(ros: Ros | null) {
     if (!action) return
 
     setStatus('pending')
+    setGoalIndex(index)
     setResult(null)
     setFeedback(null)
     setError(null)
@@ -93,6 +95,7 @@ export function useAutonomousAction(ros: Ros | null) {
 
   return {
     status,
+    goalIndex,
     result,
     feedback,
     error,

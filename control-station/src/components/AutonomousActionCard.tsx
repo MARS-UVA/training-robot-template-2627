@@ -6,6 +6,7 @@ import type {
 
 type Props = {
   status: ActionStatus
+  goalIndex: number | null
   result: AutonomousActionResult | null
   feedback: AutonomousActionFeedback | null
   error: string | null
@@ -17,13 +18,14 @@ const STATUS_LABEL: Record<ActionStatus, string> = {
   idle: 'Idle',
   pending: 'Sending goal…',
   active: 'Running',
-  succeeded: 'Succeeded',
+  succeeded: 'Completed',
   aborted: 'Aborted',
   canceled: 'Canceled',
 }
 
 export function AutonomousActionCard({
   status,
+  goalIndex,
   result,
   feedback,
   error,
@@ -31,6 +33,7 @@ export function AutonomousActionCard({
   onCancel,
 }: Props) {
   const busy = status === 'pending' || status === 'active'
+  const mazeRunning = busy && goalIndex === 2
 
   return (
     <div className="card">
@@ -51,6 +54,13 @@ export function AutonomousActionCard({
         </button>
         <button type="button" disabled={busy} onClick={() => onSendGoal(1)}>
           Drive until obstacle
+        </button>
+        <button
+          type="button"
+          disabled={busy && !mazeRunning}
+          onClick={mazeRunning ? onCancel : () => onSendGoal(2)}
+        >
+          {mazeRunning ? 'Stop Maze Autonomy' : 'Start Maze Autonomy'}
         </button>
         <button type="button" disabled={!busy} onClick={onCancel}>
           Cancel
