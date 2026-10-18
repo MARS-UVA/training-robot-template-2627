@@ -1,15 +1,13 @@
 import type { Bool } from '../hooks/useEmergencyStop';
 
-import { Topic, type Ros } from 'roslib';
+// import { Topic, type Ros } from 'roslib';
 
-export function EmergencyStopCard({ data }: { data: Bool }) {
-    // TODO: send enable=true|false to estop service when button is clicked
-
+export function EmergencyStopCard({ data, toggle }: { data: Bool, toggle: () => void }) {
     return (
         <div className="card">
             <h2>Emergency Stop</h2>
-            <p>is stopped: </p>
-            <button>STOP!</button>
+            <p>it is stopped? { data?.data ? 'yes' : 'no' }</p>
+            <button onClick={toggle}>{ !data?.data ? 'STOP!' : 'resume' }</button>
         </div>
     )
 }

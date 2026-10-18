@@ -7,6 +7,8 @@ import { useGamepadPublisher } from './hooks/useGamepadPublisher'
 import { useRos } from './hooks/useRos'
 import { useSensorData } from './hooks/useSensorData'
 import './App.css'
+import { EmergencyStopCard } from './components/EmergencyStopCard'
+import { useEmergencyStop } from './hooks/useEmergencyStop'
 
 function App() {
   const { ros, status } = useRos()
@@ -14,6 +16,7 @@ function App() {
   const { leftStick, applyStick, releaseStick, gamepadName, wasdActive } =
     useGamepadPublisher(ros)
   const autonomy = useAutonomousAction(ros)
+  const { data, toggleEstop } = useEmergencyStop(ros)
 
   return (
     <main className="control-station">
@@ -23,6 +26,11 @@ function App() {
       <div className="grid">
         <SensorDataCard
           data={sensorData}
+        />
+
+        <EmergencyStopCard
+          data={data}
+          toggle={toggleEstop}
         />
 
         <GamepadControlCard

@@ -1,9 +1,10 @@
 from software_estop_srv.srv import SoftwareEstop
 from std_msgs.msg import Bool
-from diagnostic_msgs.msg import DiagnosticArray
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 
 import rclpy
 from rclpy.node import Node
+from rclpy.executors import MultiThreadedExecutor
 
 from time import sleep
 
@@ -19,25 +20,38 @@ class EstopRobot(Node):
 
         self.is_active = False
 
-        self.pub_activity()
+        # self.pub_activity()
 
     def srv_callback(self, request, response):
-        self.get_logger().info(f'enable?: {request.enable} success?: {request.success}')
+        self.get_logger().info(f'enable?: {request.enable}')
 
         self.is_active = request.enable
-        self.pub.publish(request.enable)
+        msg = Bool()
+        msg.data = request.enable
+
+        try:
+            self.pub.publish(msg)
+            self.activity_pub.publish(msg)
+            response.success = True
+
+        except Exception as e:
+            self.get_logger().info(f'callback failed: {str(e)}')
+            response.success = False
 
         return response
 
     def sub_callback(self, diagnostics):
-        for status in diagnostics:
-            if status.byte != 0:
-                self.get_logger().info('UH OH ' + status.level + '\n' + status.name + '\n' + status.message)
+        pass
+        # for status in diagnostics.status:
+        #     if status.level != DiagnosticStatus.OK:
+        #         self.get_logger().info('UH OH ' + str(status.level) + '\n' + status.name + '\n' + status.message)
 
-    def pub_activity(self):
-        while True:
-            self.activity_pub.publish(self.is_active)
-            sleep(1 / 2)
+    # def pub_activity(self):
+    #     while True:
+    #         msg = Bool()
+    #         msg.data = self.is_active
+    #         self.activity_pub.publish(msg)
+    #         sleep(1 / 2)
 
 
 def main():
@@ -45,10 +59,22 @@ def main():
 
     node = EstopRobot()
 
-    rclpy.spin(node)
+    # use a MultiThreadedExecutor so the service callback 
+    # can run on a separate thread even if the main thread is busy
+    executor = MultiThreadedExecutor()
+    executor.add_node(node)
+    
+    try:
+        executor.spin()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
-    rclpy.shutdown()
-
+    # rclpy.spin(node)
+    # node.destroy_node()
+    # rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
