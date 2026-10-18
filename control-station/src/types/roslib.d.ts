@@ -30,4 +30,21 @@ declare module 'roslib' {
     ): string
     cancelGoal(id: string): void
   }
+
+  export default class Service<TRequest = unknown, TResponse = unknown> extends EventEmitter {
+      #private;
+      isAdvertised: boolean;
+      ros: Ros;
+      name: string;
+      serviceType: string;
+      constructor({ ros, name, serviceType, }: {
+          ros: Ros;
+          name: string;
+          serviceType: string;
+      });
+      callService(request: TRequest, callback?: (response: TResponse) => void, failedCallback?: (error: string) => void, timeout?: number): void;
+      advertise(callback: (request: TRequest, response: Partial<TResponse>) => boolean): Promise<void>;
+      unadvertise(): Promise<void>;
+      advertiseAsync(callback: (request: TRequest) => Promise<TResponse>): Promise<void>;
+  }
 }
