@@ -37,6 +37,14 @@ target_include_directories(
   include
 )
 
+# ament_target_dependencies(
+#     robot_serial_hardware PUBLIC
+#     hardware_interface
+#     rclcpp
+#     pluginlib
+#     rclcpp_lifecycle
+# )
+
 target_link_libraries(
   robot_serial_hardware PUBLIC
   hardware_interface::hardware_interface
@@ -46,6 +54,7 @@ target_link_libraries(
   rclcpp_lifecycle::rclcpp_lifecycle
 )
 
+# pluginlib_export_plugin_description_file(hardware_interface robot_serial_hardware.xml)
 
 install(
   TARGETS
